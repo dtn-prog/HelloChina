@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('phone', 20)->nullable()->after('email');
             $table->string('avatar')->nullable()->after('phone');
+            $table->timestamp('phone_verified_at')->nullable();
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active')->after('avatar');
             $table->text('two_factor_secret')->nullable()->after('status');
             $table->boolean('two_factor_enabled')->default(false)->after('two_factor_secret');
