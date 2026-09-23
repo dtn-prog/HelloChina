@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Core\Product\Resources;
-
+use Illuminate\Database\Eloquent\Builder;
 use App\Support\Contracts\CrudResource;
 use App\Core\Product\Models\Product;
 
@@ -11,7 +11,6 @@ class ProductResource implements CrudResource
     {
         return Product::class;
     }
-
     public function title(): string
     {
         return 'Product';
@@ -221,7 +220,7 @@ class ProductResource implements CrudResource
         return [];
     }
 
-    public function query($query)
+    public function query($query): Builder
     {
         return $query;
     }

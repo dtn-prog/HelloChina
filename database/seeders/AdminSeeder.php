@@ -44,6 +44,11 @@ class AdminSeeder extends Seeder
                 'email' => 'viewer@tinotech.vn',
                 'role' => 'viewer',
             ],
+            [
+                'name' => 'Learner User',
+                'email' => 'learner@tinotech.vn',
+                'role' => 'learner',
+            ],
         ];
 
         foreach ($users as $userData) {
@@ -60,6 +65,10 @@ class AdminSeeder extends Seeder
             );
 
             $user->assignRole($role);
+
+            if ($role === 'learner') {
+                $user->ensureStats();
+            }
         }
     }
 }

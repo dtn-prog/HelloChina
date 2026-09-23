@@ -23,6 +23,7 @@ class RoleSeeder extends Seeder
             'editor' => 'Content editing',
             'developer' => 'Developer access',
             'viewer' => 'Read-only access',
+            'learner' => 'App learner / student access',
         ];
 
         foreach ($roles as $name => $description) {
@@ -48,6 +49,7 @@ class RoleSeeder extends Seeder
             'login_history' => ['view'],
             'security' => ['view', 'manage'],
             'products' => ['view', 'create', 'update', 'delete', 'export', 'import'],
+            'levels' => ['view'],
         ];
 
         foreach ($modules as $module => $actions) {
@@ -70,6 +72,7 @@ class RoleSeeder extends Seeder
             'audit_logs.view',
             'media.view', 'media.create', 'media.update',
             'notifications.view', 'notifications.create',
+            'levels.view',
         ]);
 
         $finance = Role::where('name', 'finance')->first();
@@ -105,6 +108,9 @@ class RoleSeeder extends Seeder
             'dashboard.view',
             'users.view',
             'audit_logs.view',
+            'levels.view',
         ]);
+
+        // learner remains an app-side role with no admin permissions
     }
 }

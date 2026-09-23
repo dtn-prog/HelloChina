@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             SettingSeeder::class,
             FeatureFlagSeeder::class,
+            LevelSeeder::class,
         ]);
     }
 }
