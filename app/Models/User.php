@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Core\User\Models\UserStat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -56,9 +58,29 @@ class User extends Authenticatable
         return $this->hasMany(\App\Core\Auth\Models\LoginHistory::class);
     }
 
+    public function stats(): HasOne
+    {
+        return $this->hasOne(UserStat::class);
+    }
+
     public function apiKeys()
     {
         return $this->hasMany(\App\Core\Developer\Models\ApiKey::class);
+    }
+
+    public function ensureStats(): UserStat
+    {
+        return $this->stats()->firstOrCreate(
+            ['user_id' => $this->id],
+            [
+                'total_xp' => 0,
+                'current_level' => 1,
+                'gems' => 0,
+                'streak' => 0,
+                'longest_streak' => 0,
+                'last_activity_date' => null,
+            ]
+        );
     }
 
     public function isActive(): bool

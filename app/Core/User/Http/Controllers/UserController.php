@@ -8,7 +8,9 @@ use App\Core\Audit\Services\AuditService;
 use App\Core\User\Http\Requests\StoreUserRequest;
 use App\Core\User\Http\Requests\UpdateUserRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -18,7 +20,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::with('roles');
+        $query = User::with(['roles', 'stats']);
 
         if ($search = $request->input('search')) {
             $query->where(function ($q) use ($search) {
@@ -38,38 +40,53 @@ class UserController extends Controller
             });
         }
 
-        $users = $query->latest()->paginate($request->input('per_page', 15));
+        $users = $query->latest()->paginate($request->input('per_page', 15))->withQueryString();
+        $roles = Role::orderBy('name')->pluck('name');
 
         if ($request->expectsJson()) {
             return response()->json(['data' => $users]);
         }
 
-        return view('pages.users.index', compact('users'));
+        return view('pages.users.index', compact('users', 'roles'));
+    }
+
+    public function create()
+    {
+        $roles = Role::orderBy('name')->pluck('name');
+
+        return view('pages.users.create', compact('roles'));
     }
 
     public function store(StoreUserRequest $request)
     {
+        // dd('test');
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
 
         $user = User::create($data);
+        // dd('created user');
 
         if ($roles = $request->input('roles')) {
             $user->syncRoles($roles);
+
+            if (in_array('learner', $roles, true)) {
+                $user->ensureStats();
+            }
         }
+        $user->save();
 
         $this->auditService->logCreate($user, $user->toArray());
 
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'data' => $user], 201);
+            return response()->json(['success' => true, 'data' => $user->load(['roles', 'stats'])], 201);
         }
 
         return redirect()->route('users.show', $user)->with('success', 'User created successfully.');
     }
 
-    public function show(User $user)
+    public function show(Request $request, User $user)
     {
-        $user->load('roles', 'loginHistory');
+        $user->load(['roles', 'loginHistory', 'stats']);
 
         if ($request->expectsJson()) {
             return response()->json(['data' => $user]);
@@ -78,12 +95,21 @@ class UserController extends Controller
         return view('pages.users.show', compact('user'));
     }
 
+    public function edit(User $user)
+    {
+        $user->load(['roles', 'stats']);
+        $roles = Role::orderBy('name')->pluck('name');
+
+        return view('pages.users.edit', compact('user', 'roles'));
+    }
+
     public function update(UpdateUserRequest $request, User $user)
     {
         $old = $user->toArray();
         $data = $request->validated();
 
-        if (isset($data['password'])) {
+        // dd('test');
+        if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             unset($data['password']);
@@ -91,14 +117,19 @@ class UserController extends Controller
 
         $user->update($data);
 
-        if ($request->has('roles')) {
-            $user->syncRoles($request->input('roles'));
+        if ($request->boolean('_sync_roles') || $request->has('roles')) {
+            $roles = $request->input('roles', []);
+            $user->syncRoles($roles);
+
+            if (in_array('learner', $roles, true)) {
+                $user->ensureStats();
+            }
         }
 
         $this->auditService->logUpdate($user, $old, $user->toArray());
 
         if ($request->expectsJson()) {
-            return response()->json(['success' => true, 'data' => $user]);
+            return response()->json(['success' => true, 'data' => $user->load(['roles', 'stats'])]);
         }
 
         return redirect()->route('users.show', $user)->with('success', 'User updated successfully.');
@@ -131,7 +162,12 @@ class UserController extends Controller
                 'activate' => $user->update(['status' => 'active']),
                 'deactivate' => $user->update(['status' => 'inactive']),
                 'delete' => $user->delete(),
-                'assign_role' => $user->syncRoles([$request->role]),
+                'assign_role' => tap($user, function (User $user) use ($request) {
+                    $user->syncRoles([$request->role]);
+                    if ($request->role === 'learner') {
+                        $user->ensureStats();
+                    }
+                }),
             };
         }
 
