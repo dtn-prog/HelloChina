@@ -15,6 +15,7 @@ use App\Core\Developer\Http\Controllers\CronMonitorController;
 use App\Core\Monitoring\Http\Controllers\ErrorLogController;
 use App\Core\Monitoring\Http\Controllers\HealthCheckController;
 use App\Core\Language\Http\Controllers\LanguageController;
+use App\Core\Level\Http\Controllers\LevelController;
 
 // ====================================
 // Language Switcher (Public)
@@ -58,14 +59,23 @@ Route::middleware(['auth', 'admin', 'maintenance'])->group(function () {
     // ====================================
     Route::prefix('users')->name('users.')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
         Route::post('/', [UserController::class, 'store'])->name('store');
         Route::get('/export', [UserController::class, 'export'])->name('export');
         Route::post('/bulk-action', [UserController::class, 'bulkAction'])->name('bulk-action');
         Route::get('/{user}', [UserController::class, 'show'])->name('show');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
         Route::put('/{user}', [UserController::class, 'update'])->name('update');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
         Route::post('/{user}/impersonate', [UserController::class, 'impersonate'])->name('impersonate');
     });
+
+    // ====================================
+    // Levels
+    // ====================================
+    Route::get('/levels', [LevelController::class, 'index'])
+        ->name('levels.index')
+        ->middleware('permission:levels.view');
 
     // ====================================
     // Role & Permission Management
