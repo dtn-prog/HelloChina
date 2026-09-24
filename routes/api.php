@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/change-password', [AuthController::class, 'changePassword'])->name('api.auth.change-password');
 
     // Users
-    Route::apiResource('users', UserController::class)->except(['create', 'edit']);
+    // Route::apiResource('users', UserController::class)->except(['create', 'edit']);
     Route::post('/users/bulk-action', [UserController::class, 'bulkAction'])->name('api.users.bulk-action');
     Route::get('/users/export', [UserController::class, 'export'])->name('api.users.export');
 
