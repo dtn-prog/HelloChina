@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Core\Gem\Models\GemTransaction;
 use App\Core\User\Models\UserStat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -61,6 +63,11 @@ class User extends Authenticatable
     public function stats(): HasOne
     {
         return $this->hasOne(UserStat::class);
+    }
+
+    public function gemTransactions(): HasMany
+    {
+        return $this->hasMany(GemTransaction::class);
     }
 
     public function apiKeys()
