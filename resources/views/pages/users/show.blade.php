@@ -2,17 +2,35 @@
 
 @section('content')
 <div class="space-y-6">
-    <div class="flex items-center gap-4">
-        <a href="{{ route('users.index') }}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            &larr; Back
-        </a>
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+            <a href="{{ route('users.index') }}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                &larr; Back
+            </a>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->name }}</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            @can('users.update')
+            <a href="{{ route('users.edit', $user) }}" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                Edit
+            </a>
+            @endcan
+            @can('users.delete')
+            <form method="POST" action="{{ route('users.destroy', $user) }}" onsubmit="return confirm('Delete this user?')">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+                    Delete
+                </button>
+            </form>
+            @endcan
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-3">
             <h2 class="text-base font-semibold text-gray-900 dark:text-white">Profile Info</h2>
             <div>
@@ -54,9 +72,43 @@
             @endif
         </div>
 
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-3">
+            <h2 class="text-base font-semibold text-gray-900 dark:text-white">Learner Stats</h2>
+            @if($user->stats)
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Total XP</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ number_format($user->stats->total_xp) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Level</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->stats->current_level }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Gems</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ number_format($user->stats->gems) }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Streak</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->stats->streak }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Longest Streak</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->stats->longest_streak }}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase">Last Activity</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $user->stats->last_activity_date?->format('Y-m-d') ?? '—' }}</p>
+                    </div>
+                </div>
+            @else
+                <p class="text-sm text-gray-500">No stats yet. Assign the learner role to initialize.</p>
+            @endif
+        </div>
+
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h2 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Login History</h2>
-            @if(isset($user->loginHistory) && $user->loginHistory->count())
+            @if($user->loginHistory->count())
             <ul class="space-y-2">
                 @foreach($user->loginHistory->take(5) as $history)
                 <li class="text-xs text-gray-500">{{ $history->created_at->diffForHumans() }} - {{ $history->ip_address ?? '-' }}</li>
