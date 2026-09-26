@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug');
             $table->text('description')->nullable();
+            $table->longText('content')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->unsignedInteger('xp_reward')->default(0);
             $table->unsignedInteger('gem_reward')->default(0);
