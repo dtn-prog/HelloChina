@@ -24,8 +24,8 @@ return new class extends Migration
             $table->string('pinyin_clean', 255);    // "laoshi"
 
             // Vietnamese
-            $table->string('vietnamese');             // "thầy giáo"
-            $table->string('vietnamese_unaccented');  // "thay giao"
+            $table->text('vietnamese');             // "thầy giáo"
+            $table->text('vietnamese_unaccented');  // "thay giao"
 
             // Audio
             $table->string('audio_url', 255)->nullable();
