@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class DictionaryEntry extends Model
 {
@@ -18,5 +16,4 @@ class DictionaryEntry extends Model
         'vietnamese_unaccented',
         'audio_url',
     ];
-
 }

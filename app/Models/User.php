@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Core\Auth\Models\LoginHistory;
+use App\Core\Developer\Models\ApiKey;
 use App\Core\Gem\Models\GemTransaction;
 use App\Core\User\Models\UserStat;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,12 +13,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, SoftDeletes, LogsActivity;
+    use HasApiTokens, HasFactory, HasRoles, LogsActivity, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'name',
@@ -47,9 +50,9 @@ class User extends Authenticatable
         ];
     }
 
-    public function getActivitylogOptions(): \Spatie\Activitylog\LogOptions
+    public function getActivitylogOptions(): LogOptions
     {
-        return \Spatie\Activitylog\LogOptions::defaults()
+        return LogOptions::defaults()
             ->logOnly(['name', 'email', 'phone', 'status'])
             ->logOnlyDirty()
             ->useLogName('auth');
@@ -57,7 +60,7 @@ class User extends Authenticatable
 
     public function loginHistory()
     {
-        return $this->hasMany(\App\Core\Auth\Models\LoginHistory::class);
+        return $this->hasMany(LoginHistory::class);
     }
 
     public function stats(): HasOne
@@ -72,7 +75,7 @@ class User extends Authenticatable
 
     public function apiKeys()
     {
-        return $this->hasMany(\App\Core\Developer\Models\ApiKey::class);
+        return $this->hasMany(ApiKey::class);
     }
 
     public function ensureStats(): UserStat
@@ -103,8 +106,9 @@ class User extends Authenticatable
     public function getAvatarUrlAttribute(): ?string
     {
         if ($this->avatar) {
-            return asset('storage/' . $this->avatar);
+            return asset('storage/'.$this->avatar);
         }
+
         return null;
     }
 }

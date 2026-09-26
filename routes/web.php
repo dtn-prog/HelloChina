@@ -19,6 +19,16 @@ use App\Core\User\Http\Controllers\UserController;
 use App\Http\Controllers\DictionaryEntryController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('app')->group(function () {
+    Route::prefix('dictionary')->group(
+        function () {
+            Route::get('', [DictionaryEntryController::class, 'index']);
+        }
+    );
+});
+
+Route::get('/dictionaries', [DictionaryEntryController::class, 'index'])->name('dictionaries');
+
 // ====================================
 // Language Switcher (Public)
 // ====================================
@@ -44,8 +54,6 @@ Route::middleware(['auth', 'admin', 'maintenance'])->group(function () {
     Route::get('/dashboard/widgets', [DashboardController::class, 'availableWidgets'])->name('dashboard.widgets');
     Route::post('/dashboard/widgets', [DashboardController::class, 'saveWidgets'])->name('dashboard.widgets.save');
     Route::get('/dashboard/widgets/{widgetId}/refresh', [DashboardController::class, 'refreshWidget'])->name('dashboard.widgets.refresh');
-
-    Route::get('/dictionaries', [DictionaryEntryController::class, 'index'])->name('dictionaries');
 
     // Profile & Auth
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
@@ -188,8 +196,10 @@ Route::middleware(['auth', 'admin', 'maintenance'])->group(function () {
     // UI Elements (Demo)
     // ====================================
     Route::get('/calendar', fn () => view('pages.calender', ['title' => 'Calendar']))->name('calendar');
-    Route::get('/form-elements', fn () => view('pages.form.form-elements', ['title' => 'Form Elements']))->name('form-elements');
-    Route::get('/basic-tables', fn () => view('pages.tables.basic-tables', ['title' => 'Basic Tables']))->name('basic-tables');
+    Route::get('/form-elements', fn () => view('pages.form.form-elements', ['title' => 'Form Elements']))
+        ->name('form-elements');
+    Route::get('/basic-tables', fn () => view('pages.tables.basic-tables', ['title' => 'Basic Tables']))
+        ->name('basic-tables');
     Route::get('/blank', fn () => view('pages.blank', ['title' => 'Blank']))->name('blank');
     Route::get('/error-404', fn () => view('pages.errors.error-404', ['title' => 'Error 404']))->name('error-404');
     Route::get('/line-chart', fn () => view('pages.chart.line-chart', ['title' => 'Line Chart']))->name('line-chart');
