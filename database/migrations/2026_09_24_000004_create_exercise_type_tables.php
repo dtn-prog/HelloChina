@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('multiple_choice_exercises', function (Blueprint $table) {
             $table->foreignId('exercise_id')->primary()->constrained('exercises')->cascadeOnDelete();
             $table->text('question');
+            $table->string('audio')->nullable();
             $table->timestamps();
         });
 
@@ -18,6 +19,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('exercise_id')->constrained('exercises')->cascadeOnDelete();
             $table->text('content');
+            $table->string('audio')->nullable();
             $table->boolean('is_correct')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
@@ -44,6 +46,7 @@ return new class extends Migration
         Schema::create('rearrange_sentence_exercises', function (Blueprint $table) {
             $table->foreignId('exercise_id')->primary()->constrained('exercises')->cascadeOnDelete();
             $table->text('sentence');
+            $table->string('audio')->nullable();
             $table->timestamps();
         });
 
@@ -83,6 +86,7 @@ return new class extends Migration
             $table->foreignId('exercise_id')->primary()->constrained('exercises')->cascadeOnDelete();
             $table->text('source_text');
             $table->text('expected_answer');
+            $table->string('audio')->nullable();
             $table->timestamps();
         });
 
@@ -100,6 +104,7 @@ return new class extends Migration
             $table->text('question');
             $table->text('explanation')->nullable();
             $table->text('expected_answer')->nullable();
+            $table->string('audio')->nullable();
             $table->timestamps();
         });
 
@@ -108,6 +113,7 @@ return new class extends Migration
             $table->string('scenario');
             $table->text('prompt')->nullable();
             $table->string('ai_role')->nullable();
+            $table->string('audio')->nullable();
             $table->timestamps();
         });
     }
