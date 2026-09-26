@@ -7,7 +7,7 @@ Nền tảng Admin cho hệ thống TINOTECH — dùng chung cho GoPlusAI, Ecolu
 ### Yêu cầu
 
 - PHP 8.2+
-- MySQL 8.0+ / PostgreSQL
+- PostgreSQL
 - Composer
 - Node.js 18+
 
@@ -47,71 +47,11 @@ Email: admin@tinotech.vn
 Password: password
 ```
 
----
 
-## Features
-
-### ✅ Đã hoàn thành
-
-| Module | Mô tả |
-|--------|-------|
-| **Authentication** | Login, Logout, 2FA, Session Management, Login History |
-| **RBAC** | Roles, Permissions, 8 roles, 48+ permissions |
-| **User Management** | CRUD, Bulk Actions, Impersonation, Export |
-| **Audit Logging** | Auto log CRUD, before/after, IP tracking |
-| **System Settings** | Dynamic settings, grouped, cached |
-| **Feature Flags** | Enable/disable features, rollout percentage |
-| **Media Library** | Upload, folders, search, storage abstraction |
-| **Notifications** | In-app notifications, templates |
-| **Dashboard Widgets** | KPI, Activity, User Stats, System Health, Login History |
-| **Developer Tools** | API Keys, Webhooks, Queue Monitor, Cron Monitor |
-| **Monitoring** | Health Check, Error Logs, Server Monitor |
-| **Export/Import** | CSV, JSON export with queue support |
-| **Multi-language** | Vietnamese & English translations |
-| **API Platform** | Sanctum auth, RESTful endpoints |
-
-### 🔲 Đang phát triển
-
-| Module | Mô tả |
-|--------|-------|
-| **Blade CRUD Engine** | Reusable DataTable, Form Builder |
-
----
-
-## Architecture
-
-```
-app/
-├── Core/                    # Core modules
-│   ├── Auth/               # Authentication
-│   ├── User/               # User Management
-│   ├── Role/               # Role Management
-│   ├── Setting/            # System Settings
-│   ├── FeatureFlag/        # Feature Flags
-│   ├── Audit/              # Audit Logging
-│   ├── Media/              # Media Library
-│   ├── Notification/       # Notifications
-│   ├── Dashboard/          # Dashboard Widgets
-│   ├── Developer/          # API Keys, Webhooks
-│   ├── Monitoring/         # Health, Errors
-│   ├── Export/             # Export/Import
-│   └── Language/           # Multi-language
-├── Models/                 # Main models
-├── Http/Middleware/         # Custom middleware
-├── Support/                # Traits, Enums, Helpers
-```
 
 ---
 
 ## Documentation
-
-| Document | Mô tả |
-|----------|-------|
-| [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) | Kế hoạch triển khai chi tiết |
-| [API Guide](docs/API_GUIDE.md) | Hướng dẫn API & Developer |
-| [Frontend Guide](docs/FRONTEND_GUIDE.md) | Hướng dẫn tích hợp Frontend |
-| [Task Tracker](docs/TASK_TRACKER.md) | Theo dõi tiến độ |
-
 ---
 
 ## API Endpoints
