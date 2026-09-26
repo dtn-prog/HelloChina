@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Core\Audit\Services;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -8,6 +8,26 @@ use Illuminate\Support\Str;
 
 class DictionaryEntryService
 {
+    public static function search(string $keyword, string $type = 'all', int $limit = 15): Collection
+    {
+        return match ($type) {
+            'chinese' => self::searchChinese($keyword, $limit),
+            'pinyin' => self::searchPinyin($keyword, $limit),
+            'vietnamese' => self::searchVietnamese($keyword, $limit),
+            default => self::searchAll($keyword, $limit),
+        };
+    }
+
+    private static function searchAll(string $keyword, int $limit): Collection
+    {
+        return self::searchChinese($keyword, $limit)
+            ->concat(self::searchPinyin($keyword, $limit))
+            ->concat(self::searchVietnamese($keyword, $limit))
+            ->unique('id')
+            ->take($limit)
+            ->values();
+    }
+
     public static function normalizePinyin(string $keyword): string
     {
         $text = mb_strtolower(trim($keyword));

@@ -23,6 +23,7 @@ Route::prefix('app')->group(function () {
     Route::prefix('dictionary')->group(
         function () {
             Route::get('', [DictionaryEntryController::class, 'index']);
+            Route::get('/search', [DictionaryEntryController::class, 'search']);
         }
     );
 });

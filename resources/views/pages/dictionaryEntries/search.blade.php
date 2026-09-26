@@ -1,38 +1,101 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="space-y-6">
-        <div class="flex items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Create User</h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Add a new system or learner account</p>
-            </div>
-        </div>
+    <div class="space-y-4" x-data="dictionarySearch()">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Chinese-Vietnamese Dictionary</h1>
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <!-- Search Bar (desktop only) -->
-            <div class="hidden xl:block">
-                <form>
-                    <div class="relative">
-                        <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
-                            <!-- Search Icon -->
-                            <svg class="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20"
-                                fill="none">
-                                <path fill-rule="evenodd" clip-rule="evenodd"
-                                    d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"
-                                    fill="" />
-                            </svg>
-                        </span>
-                        <input type="text" placeholder="Search or type command..."
-                            class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-14 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-800 dark:bg-white/3 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 xl:w-[430px]" />
-                        <button
-                            class="absolute right-2.5 top-1/2 inline-flex -translate-y-1/2 items-center gap-0.5 rounded-lg border border-gray-200 bg-gray-50 px-[7px] py-[4.5px] text-xs -tracking-[0.2px] text-gray-500 dark:border-gray-800 dark:bg-white/[0.03] dark:text-gray-400">
-                            <span> ⌘ </span>
-                            <span> K </span>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+        <form @submit.prevent="search" class="flex flex-col gap-3 sm:flex-row">
+            <label class="sr-only" for="dictionary-type">Search language</label>
+            <select id="dictionary-type" x-model="type" class="h-11 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+                <option value="all">All languages</option>
+                <option value="chinese">Chinese</option>
+                <option value="pinyin">Pinyin</option>
+                <option value="vietnamese">Vietnamese</option>
+            </select>
+            <label class="sr-only" for="dictionary-keyword">Search term</label>
+            <input id="dictionary-keyword" x-model="keyword" type="search" maxlength="100" required placeholder="中文, pinyin, tiếng Việt"
+                class="h-11 min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-900 placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white">
+            <button type="submit" :disabled="loading" class="h-11 rounded-lg bg-blue-600 px-5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-60">
+                <span x-text="loading ? 'Searching...' : 'Search'"></span>
+            </button>
+        </form>
+
+        <p x-show="message" x-text="message" role="status" class="text-sm text-gray-600 dark:text-gray-300"></p>
+        <div id="dictionary-results" class="divide-y divide-gray-200 rounded-lg border border-gray-200 bg-white dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"></div>
     </div>
 @endsection
+
+@push('scripts')
+<script>
+    function dictionarySearch() {
+        return {
+            keyword: '',
+            type: 'all',
+            loading: false,
+            message: '',
+
+            async search() {
+                this.loading = true;
+                this.message = '';
+                const results = document.getElementById('dictionary-results');
+                results.replaceChildren();
+
+                const url = new URL('/app/dictionary/search', window.location.origin);
+                url.searchParams.set('keyword', this.keyword.trim());
+                url.searchParams.set('type', this.type);
+
+                try {
+                    const response = await fetch(url, {
+                        headers: { Accept: 'application/json' },
+                    });
+                    const payload = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(payload.message || 'Search failed.');
+                    }
+
+                    const entries = payload.data || [];
+                    this.message = `${entries.length} result${entries.length === 1 ? '' : 's'}`;
+
+                    entries.forEach((entry) => {
+                        const row = document.createElement('article');
+                        row.className = 'space-y-1 p-4';
+
+                        const characters = document.createElement('h2');
+                        characters.className = 'text-xl font-semibold text-gray-900 dark:text-white';
+                        characters.textContent = [entry.simplified, entry.traditional]
+                            .filter((value, index, values) => value && values.indexOf(value) === index)
+                            .join(' / ') || 'No Chinese characters';
+                        row.append(characters);
+
+                        const pinyin = document.createElement('p');
+                        pinyin.className = 'text-sm text-gray-600 dark:text-gray-300';
+                        pinyin.textContent = `Pinyin: ${entry.pinyin_accented || entry.pinyin || entry.pinyin_clean || '—'}`;
+                        row.append(pinyin);
+
+                        const vietnamese = document.createElement('p');
+                        vietnamese.className = 'whitespace-pre-line text-sm text-gray-800 dark:text-gray-100';
+                        vietnamese.textContent = `Vietnamese: ${entry.vietnamese || '—'}`;
+                        row.append(vietnamese);
+
+                        if (entry.audio_url) {
+                            const audio = document.createElement('audio');
+                            audio.controls = true;
+                            audio.preload = 'none';
+                            audio.src = entry.audio_url;
+                            audio.className = 'mt-2 h-9 max-w-full';
+                            row.append(audio);
+                        }
+
+                        results.append(row);
+                    });
+                } catch (error) {
+                    this.message = error.message;
+                } finally {
+                    this.loading = false;
+                }
+            },
+        };
+    }
+</script>
+@endpush

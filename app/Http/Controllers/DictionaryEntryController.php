@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDictionaryEntryRequest;
 use App\Http\Requests\UpdateDictionaryEntryRequest;
 use App\Models\DictionaryEntry;
+use App\Core\Audit\Services\DictionaryEntryService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class DictionaryEntryController extends Controller
 {
@@ -14,6 +17,23 @@ class DictionaryEntryController extends Controller
     public function index()
     {
         return view('pages.dictionaryEntries.search');
+    }
+
+    public function search(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'keyword' => ['required', 'string', 'max:100'],
+            'type' => ['sometimes', 'string', 'in:all,chinese,pinyin,vietnamese'],
+            'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
+        ]);
+
+        $entries = DictionaryEntryService::search(
+            $validated['keyword'],
+            $validated['type'] ?? 'all',
+            (int) ($validated['limit'] ?? 200),
+        );
+
+        return response()->json(['data' => $entries]);
     }
 
     /**

@@ -16,7 +16,7 @@ Nền tảng Admin cho hệ thống TINOTECH — dùng chung cho GoPlusAI, Ecolu
 ```bash
 # Clone project
 git clone <repo-url>
-cd base_adminbase_v2
+cd helloChina
 
 # Install dependencies
 composer install
