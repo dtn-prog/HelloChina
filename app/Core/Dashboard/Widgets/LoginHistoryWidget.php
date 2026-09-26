@@ -67,7 +67,7 @@ class LoginHistoryWidget implements WidgetContract
             ->where('created_at', '>=', now()->subHours(24))
             ->select('ip_address', DB::raw('count(*) as attempts'))
             ->groupBy('ip_address')
-            ->having('attempts', '>=', 5)
+            // ->having('attempts', '>=', 5)
             ->get()
             ->toArray();
 
