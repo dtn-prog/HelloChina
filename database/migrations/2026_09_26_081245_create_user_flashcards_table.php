@@ -29,7 +29,7 @@ return new class extends Migration
 
             $table->unsignedInteger('interval')->default(0);
             $table->decimal('ease', 4, 2)->default(2.50);
-
+            $table->timestamp('last_reviewed_at')->nullable();
             $table->timestamp('due_at')->nullable();
 
             $table->timestamps();
