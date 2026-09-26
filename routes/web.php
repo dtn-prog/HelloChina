@@ -1,21 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Core\Dashboard\Http\Controllers\DashboardController;
-use App\Core\Auth\Http\Controllers\AuthController;
-use App\Core\User\Http\Controllers\UserController;
-use App\Core\Role\Http\Controllers\RoleController;
-use App\Core\Setting\Http\Controllers\SettingController;
 use App\Core\Audit\Http\Controllers\AuditController;
-use App\Core\Media\Http\Controllers\MediaController;
+use App\Core\Auth\Http\Controllers\AuthController;
+use App\Core\Dashboard\Http\Controllers\DashboardController;
 use App\Core\Developer\Http\Controllers\ApiKeyController;
-use App\Core\Developer\Http\Controllers\WebhookController;
-use App\Core\Developer\Http\Controllers\QueueMonitorController;
 use App\Core\Developer\Http\Controllers\CronMonitorController;
-use App\Core\Monitoring\Http\Controllers\ErrorLogController;
-use App\Core\Monitoring\Http\Controllers\HealthCheckController;
+use App\Core\Developer\Http\Controllers\QueueMonitorController;
+use App\Core\Developer\Http\Controllers\WebhookController;
 use App\Core\Language\Http\Controllers\LanguageController;
 use App\Core\Level\Http\Controllers\LevelController;
+use App\Core\Media\Http\Controllers\MediaController;
+use App\Core\Monitoring\Http\Controllers\ErrorLogController;
+use App\Core\Monitoring\Http\Controllers\HealthCheckController;
+use App\Core\Product\Http\Controllers\ProductController;
+use App\Core\Role\Http\Controllers\RoleController;
+use App\Core\Setting\Http\Controllers\SettingController;
+use App\Core\User\Http\Controllers\UserController;
+use App\Http\Controllers\DictionaryEntryController;
+use Illuminate\Support\Facades\Route;
 
 // ====================================
 // Language Switcher (Public)
@@ -42,6 +44,8 @@ Route::middleware(['auth', 'admin', 'maintenance'])->group(function () {
     Route::get('/dashboard/widgets', [DashboardController::class, 'availableWidgets'])->name('dashboard.widgets');
     Route::post('/dashboard/widgets', [DashboardController::class, 'saveWidgets'])->name('dashboard.widgets.save');
     Route::get('/dashboard/widgets/{widgetId}/refresh', [DashboardController::class, 'refreshWidget'])->name('dashboard.widgets.refresh');
+
+    Route::get('/dictionaries', [DictionaryEntryController::class, 'index'])->name('dictionaries');
 
     // Profile & Auth
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
@@ -125,11 +129,11 @@ Route::middleware(['auth', 'admin', 'maintenance'])->group(function () {
     // ====================================
     // Products (Example CRUD Module)
     // ====================================
-    Route::resource('products', \App\Core\Product\Http\Controllers\ProductController::class)
+    Route::resource('products', ProductController::class)
         ->middleware('permission:products.view');
-    Route::post('/products/bulk-action', [\App\Core\Product\Http\Controllers\ProductController::class, 'bulkAction'])
+    Route::post('/products/bulk-action', [ProductController::class, 'bulkAction'])
         ->name('products.bulk-action');
-    Route::get('/products/export', [\App\Core\Product\Http\Controllers\ProductController::class, 'export'])
+    Route::get('/products/export', [ProductController::class, 'export'])
         ->name('products.export')
         ->middleware('permission:products.export');
 

@@ -2,8 +2,8 @@
 
 namespace App\Core\Dashboard\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Core\Dashboard\Services\DashboardService;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -66,11 +66,11 @@ class DashboardController extends Controller
     {
         $widget = $this->dashboardService->getWidget($widgetId);
 
-        if (!$widget) {
+        if (! $widget) {
             return response()->json(['error' => 'Widget not found'], 404);
         }
 
-        if (!$widget->canAccess($request->user())) {
+        if (! $widget->canAccess($request->user())) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
