@@ -28,6 +28,10 @@ php artisan key:generate
 
 # Database
 php artisan migrate
+
+php artisan import:hanzi-full # import bộ từ điển hán tự
+php artisan import:dictionary # import từ điển trung việt
+
 php artisan db:seed
 
 # Storage
